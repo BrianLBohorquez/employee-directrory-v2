@@ -1,0 +1,46 @@
+import express from "express";
+import {
+  getEmployees,
+  getEmployee,
+  getRandomEmployee,
+  addEmployee,
+} from "#db/employees";
+
+const router = express.Router();
+export default router;
+
+router.get("/", (req, res) => {
+  const employees = getEmployees();
+  res.send(employees);
+});
+
+router.get("/random", (req, res) => {
+  const employee = getRandomEmployee();
+  res.send(employee);
+});
+
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+  const employee = getEmployee(Number(id));
+
+  if (!employee) {
+    return res.status(404).send(`Employee #${id} not found.`);
+  }
+
+  res.send(employee);
+});
+
+router.post("/", (req, res) => {
+  if (!req.body) {
+    return res.status(400).send("Request body is required.");
+  }
+
+  const { name } = req.body;
+
+  if (!name) {
+    return res.status(400).send("New employee needs a name.");
+  }
+
+  const employee = addEmployee(name);
+  res.status(201).send(employee);
+});
